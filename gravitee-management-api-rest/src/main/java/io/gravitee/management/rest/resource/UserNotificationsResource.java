@@ -18,7 +18,7 @@ package io.gravitee.management.rest.resource;
 import io.gravitee.common.http.MediaType;
 import io.gravitee.management.model.NotificationEntity;
 import io.gravitee.management.rest.model.PagedResult;
-import io.gravitee.management.service.NotificationService;
+import io.gravitee.management.service.PortalNotificationService;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,7 +26,6 @@ import javax.ws.rs.*;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -37,25 +36,22 @@ import java.util.stream.Collectors;
 public class UserNotificationsResource extends AbstractResource  {
 
     @Autowired
-    private NotificationService notificationService;
+    private PortalNotificationService portalNotificationService;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public PagedResult<NotificationEntity> list()  {
-        List<NotificationEntity> notifications = notificationService.findByUsername(getAuthenticatedUsername())
+        List<NotificationEntity> notifications = portalNotificationService.findByUsername(getAuthenticatedUsername())
                 .stream()
                 .sorted(Comparator.comparing(NotificationEntity::getCreateAt))
                 .collect(Collectors.toList());
 
-        PagedResult<NotificationEntity> pagedResult = new PagedResult(notifications, Collections.emptyMap());
-        PagedResult.Page page = pagedResult.new Page(1, notifications.size(), notifications.size(), 1, notifications.size());
-        pagedResult.setPage(page);
-        return pagedResult;
+        return new PagedResult<>(notifications);
     }
 
     @Path("{notification}")
     @DELETE
     public void delete(@PathParam("notification") String notificationId) {
-        notificationService.delete(notificationId);
+        portalNotificationService.delete(notificationId);
     }
 }

@@ -16,7 +16,7 @@
 package io.gravitee.management.repository.proxy;
 
 import io.gravitee.repository.exceptions.TechnicalException;
-import io.gravitee.repository.management.api.NotificationRepository;
+import io.gravitee.repository.management.api.PortalNotificationRepository;
 import io.gravitee.repository.management.model.Notification;
 import org.springframework.stereotype.Component;
 
@@ -28,7 +28,7 @@ import java.util.Optional;
  * @author GraviteeSource Team
  */
 @Component
-public class NotificationRepositoryProxy extends AbstractProxy<NotificationRepository> implements NotificationRepository {
+public class PortalNotificationRepositoryProxy extends AbstractProxy<PortalNotificationRepository> implements PortalNotificationRepository {
 
     @Override
     public Optional<Notification> findById(String s) throws TechnicalException {

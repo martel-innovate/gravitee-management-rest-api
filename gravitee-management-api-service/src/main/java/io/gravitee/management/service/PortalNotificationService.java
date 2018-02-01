@@ -15,16 +15,21 @@
  */
 package io.gravitee.management.service;
 
-import io.gravitee.management.service.notification.Hook;
-import io.gravitee.management.service.notification.HookScope;
+import io.gravitee.management.model.NewNotificationEntity;
+import io.gravitee.management.model.NotificationEntity;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Nicolas GERAUD (nicolas.geraud at graviteesource.com)
  * @author GraviteeSource Team
  */
-public interface NotificationService {
+public interface PortalNotificationService {
 
-    Collection<Hook> findHooksByScope(HookScope scope);
+    List<NotificationEntity> findByUsername(String username);
+
+    NotificationEntity create(NewNotificationEntity notification);
+
+    void delete(String notificationId);
+
 }

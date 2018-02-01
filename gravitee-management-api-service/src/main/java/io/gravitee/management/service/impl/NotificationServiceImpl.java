@@ -15,22 +15,15 @@
  */
 package io.gravitee.management.service.impl;
 
-import io.gravitee.common.utils.UUID;
-import io.gravitee.management.model.NewNotificationEntity;
-import io.gravitee.management.model.NotificationEntity;
 import io.gravitee.management.service.NotificationService;
-import io.gravitee.management.service.exceptions.TechnicalManagementException;
-import io.gravitee.repository.exceptions.TechnicalException;
-import io.gravitee.repository.management.api.NotificationRepository;
-import io.gravitee.repository.management.model.Notification;
+import io.gravitee.management.service.notification.Hook;
+import io.gravitee.management.service.notification.HookScope;
+import io.gravitee.management.service.notification.Hooks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Collection;
 
 /**
  * @author Nicolas GERAUD (nicolas.geraud at graviteesource.com)
@@ -41,56 +34,12 @@ public class NotificationServiceImpl extends AbstractService implements Notifica
 
     private final Logger LOGGER = LoggerFactory.getLogger(NotificationServiceImpl.class);
 
-    @Autowired
-    private NotificationRepository notificationRepository;
-
     @Override
-    public List<NotificationEntity> findByUsername(String username) {
-        try {
-            return notificationRepository.findByUsername(username).stream().map(this::convert).collect(Collectors.toList());
-        } catch (TechnicalException ex) {
-            LOGGER.error("An error occurs while trying to find notifications by username {}", username, ex);
-            throw new TechnicalManagementException("An error occurs while trying to find notifications by username " + username, ex);
+    public Collection<Hook> findHooksByScope(HookScope scope) {
+        if (scope == null) {
+            LOGGER.error("A scope must be specified");
+            throw new IllegalArgumentException("A scope must be specified");
         }
-    }
-
-    @Override
-    public NotificationEntity create(NewNotificationEntity notificationEntity) {
-        Notification notification = convert(notificationEntity);
-        notification.setId(UUID.toString(UUID.random()));
-        notification.setCreatedAt(new Date());
-        try {
-            return convert(notificationRepository.create(notification));
-        } catch (TechnicalException ex) {
-            LOGGER.error("An error occurs while trying to create {}", notification, ex);
-            throw new TechnicalManagementException("An error occurs while trying create " + notification, ex);
-        }
-    }
-
-    @Override
-    public void delete(String notificationId) {
-        try {
-            notificationRepository.delete(notificationId);
-        } catch (TechnicalException ex) {
-            LOGGER.error("An error occurs while trying to delete {}", notificationId, ex);
-            throw new TechnicalManagementException("An error occurs while trying delete " + notificationId, ex);
-        }
-    }
-
-    private Notification convert(NewNotificationEntity entity) {
-        Notification notification = new Notification();
-        notification.setTitle(entity.getTitle());
-        notification.setMessage(entity.getMessage());
-        notification.setUsername(entity.getMessage());
-        return notification;
-    }
-
-    private NotificationEntity convert(Notification notification) {
-        NotificationEntity entity = new NotificationEntity();
-        entity.setId(notification.getId());
-        entity.setTitle(notification.getTitle());
-        entity.setMessage(notification.getMessage());
-        entity.setCreateAt(notification.getCreatedAt());
-        return entity;
+        return Hooks.get(scope);
     }
 }
